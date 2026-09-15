@@ -27,7 +27,7 @@ team:
       email: "23dcs128@charusat.edu.in"
 
 submission:
-  title: "Drug Safety Signal Detector"                           # REQUIRED — Project display name, e.g., "SmartOps Dashboard"
+  title: "Drug Safety Signal Detector"
 
   problem_statement: >
     Millions of adverse drug event reports are collected in the FDA database,
@@ -37,10 +37,10 @@ submission:
 
   solution_summary: >
     Drug Safety Signal Detector analyzes publicly available FDA adverse event
-    reports and calculates the Proportional Reporting Ratio (PRR) for drug-reaction
-    pairs. It identifies and ranks disproportionate reporting signals, visualizes
-    trends over time, and provides plain-English summaries to help users interpret
-    potential safety signals.
+    reports and calculates the Proportional Reporting Ratio (PRR) for
+    drug-reaction pairs. It identifies and ranks disproportionate reporting
+    signals, visualizes trends over time, and provides plain-English summaries
+    to help users interpret potential safety signals.
 
   key_features:
     - "Search and filter FDA adverse event reports by drug and reaction"
@@ -50,13 +50,21 @@ submission:
     - "Plain-English AI-generated summaries of detected safety signals"
 
   tech_stack:
-    languages: ["Python"]                      # REQUIRED — e.g., ["Python", "TypeScript"]
-    frameworks: ["Streamlit"]                     # e.g., ["FastAPI", "React"]
-    ibm_technologies: ["IBM Bob"]               # e.g., ["watsonx.ai", "IBM Bob", "IBM Cloud Functions"]
-    databases: ["SQLite"]                      # e.g., ["PostgreSQL", "Redis"]
-    other: ["Pandas","NumPy","SciPy","Plotly","Requests","openFDA API","GitHub","GitHub Actions"]                          # e.g., ["Docker", "GitHub Actions", "Slack API"]
+    languages: ["Python"]
+    frameworks: ["Streamlit"]
+    ibm_technologies: ["IBM Bob"]
+    databases: ["SQLite"]
+    other:
+      - "Pandas"
+      - "NumPy"
+      - "SciPy"
+      - "Plotly"
+      - "Requests"
+      - "openFDA API"
+      - "GitHub"
+      - "GitHub Actions"
 
-   what_we_are_most_proud_of: >
+  what_we_are_most_proud_of: >
     Our strongest aspect is the combination of real FDA adverse event data with
     a transparent and explainable PRR-based statistical method. The dashboard
     turns large-scale adverse-event data into ranked safety signals and
