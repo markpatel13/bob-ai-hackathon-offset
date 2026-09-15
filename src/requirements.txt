@@ -14,9 +14,6 @@ streamlit==1.54.0          # Dashboard UI
 pandas==2.3.3              # DataFrames, time-series, normalisation
 numpy==2.4.2               # Numerical operations (used by pandas / scipy)
 
-# --- Statistics ---------------------------------------------------------
-scipy==1.16.0              # Statistical tests (chi-square, etc.)
-
 # --- Visualisation ------------------------------------------------------
 plotly==6.6.0              # Interactive charts in the Streamlit dashboard
 
