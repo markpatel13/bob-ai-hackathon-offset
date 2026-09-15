@@ -78,16 +78,37 @@ def fetch_adverse_events(
 
     try:
         response = requests.get(FDA_BASE_URL, params=params, timeout=15)
+    except requests.RequestException as exc:
+        raise FDAAPIError(
+            f"Network error contacting openFDA: {exc}"
+        ) from exc
+
+    # openFDA returns 404 when a valid query matches zero records.
+    # Treat this as an empty result rather than a hard failure.
+    if response.status_code == 404:
+        raise FDAAPIError(
+            "No records found for your search. "
+            "Check that the drug name and reaction are spelled correctly "
+            "and exist in the FDA adverse-event database. "
+            "Reaction terms must match MedDRA preferred terms exactly "
+            "(e.g. 'NAUSEA', not 'nauseau')."
+        )
+
+    try:
         response.raise_for_status()
         data = response.json()
-    except (requests.RequestException, ValueError) as exc:
+    except requests.HTTPError as exc:
         raise FDAAPIError(
-            f"Unable to retrieve adverse-event reports: {exc}"
+            f"openFDA returned an error ({response.status_code}): {exc}"
+        ) from exc
+    except ValueError as exc:
+        raise FDAAPIError(
+            f"openFDA returned an unreadable response: {exc}"
         ) from exc
 
     if "results" not in data:
         raise FDAAPIError(
-            f"No results in FDA response. "
+            "openFDA response contained no results. "
             f"Meta: {data.get('meta', {})}"
         )
 
