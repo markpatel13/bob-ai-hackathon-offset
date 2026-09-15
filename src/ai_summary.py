@@ -14,7 +14,9 @@ Optional LLM integration can be added later without changing the
 rest of the application.
 """
 
-from typing import Any, Dict, Optional
+from __future__ import annotations
+
+from typing import Any
 
 import math
 import pandas as pd
@@ -179,7 +181,7 @@ def generate_summary(
 def _build_short_summary(
     drug: str,
     reaction: str,
-    prr: Optional[float],
+    prr: float | None,
     report_count: int,
     signal_class: str,
 ) -> str:
@@ -206,7 +208,7 @@ def _build_short_summary(
 def _build_standard_summary(
     drug: str,
     reaction: str,
-    prr: Optional[float],
+    prr: float | None,
     signal_class: str,
     A: int,
     drug_total: int,
@@ -255,7 +257,7 @@ def _build_standard_summary(
 def _build_detailed_summary(
     drug: str,
     reaction: str,
-    prr: Optional[float],
+    prr: float | None,
     signal_class: str,
     A: int,
     B: int,
@@ -322,7 +324,7 @@ def _build_detailed_summary(
 def generate_summaries(
     signals: pd.DataFrame,
     style: str = DEFAULT_SUMMARY_STYLE,
-    limit: Optional[int] = None,
+    limit: int | None = None,
 ) -> pd.DataFrame:
     """
     Generate summaries for multiple detected signals.
@@ -360,13 +362,10 @@ def generate_summaries(
 
         result = result.head(limit).copy()
 
-    result["summary"] = result.apply(
-        lambda row: generate_summary(
-            row,
-            style=style,
-        ),
-        axis=1,
-    )
+    result["summary"] = [
+        generate_summary(row, style=style)
+        for _, row in result.iterrows()
+    ]
 
     return result
 
@@ -377,7 +376,7 @@ def generate_summaries(
 
 def get_signal_facts(
     signal: Any,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """
     Extract verified statistical facts from a signal.
 
@@ -419,7 +418,7 @@ def get_signal_facts(
 
 def generate_llm_summary(
     signal: Any,
-    provider: Optional[Any] = None,
+    provider: Any = None,
 ) -> str:
     """
     Optional extension point for an external/local LLM.
@@ -515,7 +514,7 @@ signal means and clearly state that it does not establish causality.
 
 def _convert_signal_to_dict(
     signal: Any,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """
     Convert a Series or dictionary into a normal dictionary.
     """
@@ -532,7 +531,7 @@ def _convert_signal_to_dict(
 
 
 def _validate_signal_data(
-    data: Dict[str, Any],
+    data: dict[str, Any],
 ) -> None:
     """
     Validate required signal fields.
@@ -597,7 +596,7 @@ def _safe_integer(
 
 def _safe_number(
     value: Any,
-) -> Optional[float]:
+) -> float | None:
     """
     Safely convert a value to a float.
     """
@@ -619,7 +618,7 @@ def _safe_number(
 
 
 def _format_prr(
-    value: Optional[float],
+    value: float | None,
 ) -> str:
     """
     Format PRR for natural-language output.
@@ -635,7 +634,7 @@ def _format_prr(
 
 
 def _format_percentage(
-    value: Optional[float],
+    value: float | None,
 ) -> str:
     """
     Convert a decimal rate to a percentage string.
@@ -648,7 +647,7 @@ def _format_percentage(
 
 
 def _describe_prr(
-    prr: Optional[float],
+    prr: float | None,
 ) -> str:
     """
     Convert a PRR into a plain-English comparison.
