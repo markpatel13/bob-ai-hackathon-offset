@@ -9,61 +9,72 @@
 # =============================================================================
 
 team:
-  name: ""                             # REQUIRED — e.g., "Orion Squad"
-  track: ""                            # REQUIRED — one of: AI | DevOps | Sustainability | Open
+  name: "offset"
+  track: "AI"
+
   lead:
-    name: ""                           # REQUIRED — e.g., "Alice Chen"
-    email: ""                          # REQUIRED — e.g., "alice.chen@ibm.com"
+    name: "Mark Patel"
+    email: "23dcs083@charusat.edu.in"
+
   members:
-    - name: ""                         # REQUIRED — Team member 1
-      email: ""
-    - name: ""                         # Add more members by copying the two lines above
-      email: ""
-    - name: ""
-      email: ""
+    - name: "Mir Patel"
+      email: "23dcs086@charusat.edu.in"
+
+    - name: "Samad Sama"
+      email: "23dcs112@charusat.edu.in"
+
+    - name: "Keya Sonaiya"
+      email: "23dcs128@charusat.edu.in"
 
 submission:
-  title: ""                            # REQUIRED — Project display name, e.g., "SmartOps Dashboard"
+  title: "Drug Safety Signal Detector"                           # REQUIRED — Project display name, e.g., "SmartOps Dashboard"
 
-  problem_statement: >                 # REQUIRED — 1-3 sentences. What problem? Who has it?
-    Replace this text with a concise description of the real-world problem
-    your project addresses and who experiences it.
+  problem_statement: >
+    Millions of adverse drug event reports are collected in the FDA database,
+    making it difficult to identify unusual drug-reaction patterns early.
+    Pharmacovigilance teams need a way to detect potentially important safety
+    signals from large volumes of real-world adverse event reports.
 
-  solution_summary: >                  # REQUIRED — 1-3 sentences. What did you build?
-    Replace this text with a clear description of your solution
-    and how it addresses the problem above.
+  solution_summary: >
+    Drug Safety Signal Detector analyzes publicly available FDA adverse event
+    reports and calculates the Proportional Reporting Ratio (PRR) for drug-reaction
+    pairs. It identifies and ranks disproportionate reporting signals, visualizes
+    trends over time, and provides plain-English summaries to help users interpret
+    potential safety signals.
 
-  key_features:                        # REQUIRED — List 3 to 5 specific features you implemented
-    - ""                               # e.g., "Real-time pipeline anomaly detection using watsonx.ai"
-    - ""
-    - ""
-    - ""                               # optional 4th
-    - ""                               # optional 5th
+  key_features:
+    - "Search and filter FDA adverse event reports by drug and reaction"
+    - "PRR-based statistical signal detection for drug-reaction pairs"
+    - "Ranked safety signal dashboard showing signal strength and report counts"
+    - "Trend visualization showing adverse-event report volume over time"
+    - "Plain-English AI-generated summaries of detected safety signals"
 
   tech_stack:
-    languages: []                      # REQUIRED — e.g., ["Python", "TypeScript"]
-    frameworks: []                     # e.g., ["FastAPI", "React"]
-    ibm_technologies: []               # e.g., ["watsonx.ai", "IBM Bob", "IBM Cloud Functions"]
-    databases: []                      # e.g., ["PostgreSQL", "Redis"]
-    other: []                          # e.g., ["Docker", "GitHub Actions", "Slack API"]
+    languages: ["Python"]                      # REQUIRED — e.g., ["Python", "TypeScript"]
+    frameworks: ["Streamlit"]                     # e.g., ["FastAPI", "React"]
+    ibm_technologies: ["IBM Bob"]               # e.g., ["watsonx.ai", "IBM Bob", "IBM Cloud Functions"]
+    databases: ["SQLite"]                      # e.g., ["PostgreSQL", "Redis"]
+    other: ["Pandas","NumPy","SciPy","Plotly","Requests","openFDA API","GitHub","GitHub Actions"]                          # e.g., ["Docker", "GitHub Actions", "Slack API"]
 
-  what_we_are_most_proud_of: >         # Optional but recommended — guides judges to your best work
-    Replace with what aspect of the submission you consider strongest
-    and want judges to pay special attention to.
+   what_we_are_most_proud_of: >
+    Our strongest aspect is the combination of real FDA adverse event data with
+    a transparent and explainable PRR-based statistical method. The dashboard
+    turns large-scale adverse-event data into ranked safety signals and
+    understandable visual insights while clearly distinguishing statistical
+    signals from confirmed causal relationships.
 
-  known_limitations: >                 # Optional but recommended — be honest about gaps
-    Replace with any known limitations, incomplete features,
-    or shortcuts taken due to time constraints.
+  known_limitations: >
+    The system identifies statistical reporting signals and does not establish
+    that a drug caused a particular adverse reaction. Results can be affected
+    by reporting bias, missing data, duplicate reports, and differences in
+    reporting practices. The prototype is intended to support pharmacovigilance
+    analysis rather than replace expert medical or regulatory assessment.
 
-# =============================================================================
-# ARTIFACT LOCATIONS
-# These paths are relative to the repo root. Only change if you moved files.
-# =============================================================================
 artifacts:
   source_code: "src/"
   setup_guide: "docs/setup-guide.md"
   architecture_doc: "docs/architecture.md"
-  demo_video: "demo/demo-video-link.txt"   # URL to hosted video (YouTube, Loom, Box)
-  live_demo: "demo/live-demo-url.txt"      # URL to deployed demo (optional)
+  demo_video: "demo/demo-video-link.txt"
+  live_demo: "demo/live-demo-url.txt"
   screenshots: "demo/screenshots/"
   presentation: "presentation/"
