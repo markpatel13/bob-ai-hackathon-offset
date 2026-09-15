@@ -10,8 +10,6 @@ Important:
     It does NOT establish that a drug caused a reaction.
 """
 
-from typing import Optional
-
 import pandas as pd
 
 
@@ -153,8 +151,6 @@ def calculate_prr(
     # Universe is all reports represented in the dataset.
     # ---------------------------------------------------------------
 
-    all_reports = set(records["report_id"])
-
     other_drug_reports = set(
         records.loc[
             records["drug_name"] != drug_name,
@@ -242,6 +238,19 @@ def calculate_all_prrs(
         ["report_id", "drug_name", "reaction"]
     ].drop_duplicates()
 
+    # Pre-build lookup indexes so each per-pair calculation is O(1)
+    # set operations rather than repeated DataFrame scans.
+    drug_index: dict = (
+        records.groupby("drug_name")["report_id"]
+        .apply(set)
+        .to_dict()
+    )
+    reaction_index: dict = (
+        records.groupby("reaction")["report_id"]
+        .apply(set)
+        .to_dict()
+    )
+
     # Count reports for every drug-reaction pair.
     pair_counts = (
         records.groupby(
@@ -259,8 +268,9 @@ def calculate_all_prrs(
 
     for _, pair in pair_counts.iterrows():
 
-        result = calculate_prr(
-            records,
+        result = _calculate_prr_from_index(
+            drug_index,
+            reaction_index,
             pair["drug_name"],
             pair["reaction"],
         )
@@ -340,19 +350,21 @@ def add_signal_classification(
     """
 
     if prr_dataframe is None or prr_dataframe.empty:
-        return prr_dataframe.copy()
+        return pd.DataFrame()
 
     result = prr_dataframe.copy()
 
-    result["signal_class"] = result.apply(
-        lambda row: classify_signal(
-            prr=row["prr"],
-            report_count=int(row["A"]),
-            min_prr=min_prr,
-            min_reports=min_reports,
-        ),
-        axis=1,
-    )
+    a = result["A"]
+    prr_col = result["prr"]
+
+    insufficient = a < min_reports
+    strong = (~insufficient) & (prr_col == float("inf"))
+    signal = (~insufficient) & (~strong) & (prr_col >= min_prr)
+
+    result["signal_class"] = "No Signal"
+    result.loc[signal, "signal_class"] = "Signal"
+    result.loc[strong, "signal_class"] = "Strong Signal"
+    result.loc[insufficient, "signal_class"] = "Insufficient Reports"
 
     return result
 
@@ -436,6 +448,83 @@ def get_top_signals(
     )
 
     return ranked.head(top_n).copy()
+
+
+def _calculate_prr_from_index(
+    drug_index: dict,
+    reaction_index: dict,
+    drug_name: str,
+    reaction: str,
+) -> dict:
+    """
+    Calculate PRR using pre-built report-set indexes.
+
+    Avoids repeated DataFrame scans when computing PRR for many pairs.
+
+    Parameters
+    ----------
+    drug_index : dict
+        Mapping of drug_name -> set of report_ids.
+
+    reaction_index : dict
+        Mapping of reaction -> set of report_ids.
+
+    drug_name : str
+        Already-normalized drug name.
+
+    reaction : str
+        Already-normalized reaction name.
+    """
+
+    drug_reports = drug_index.get(drug_name, set())
+    reaction_reports = reaction_index.get(reaction, set())
+
+    a_reports = drug_reports & reaction_reports
+    A = len(a_reports)
+    B = len(drug_reports - reaction_reports)
+
+    # All reports for the given reaction that come from *other* drugs.
+    # A report may list multiple drugs; we count it if any other drug
+    # is present, mirroring the original logic.
+    other_drug_reaction_reports: set = set()
+    for d, d_reports in drug_index.items():
+        if d != drug_name:
+            other_drug_reaction_reports |= d_reports & reaction_reports
+
+    C = len(other_drug_reaction_reports)
+
+    # D: other drugs + other reactions.
+    all_other_drug_reports: set = set()
+    for d, d_reports in drug_index.items():
+        if d != drug_name:
+            all_other_drug_reports |= d_reports
+
+    D = len(all_other_drug_reports - reaction_reports)
+
+    drug_total = A + B
+    other_drug_total = C + D
+
+    drug_reaction_rate = A / drug_total if drug_total > 0 else 0.0
+    other_drug_reaction_rate = C / other_drug_total if other_drug_total > 0 else 0.0
+
+    if other_drug_reaction_rate == 0:
+        prr = float("inf") if drug_reaction_rate > 0 else 0.0
+    else:
+        prr = drug_reaction_rate / other_drug_reaction_rate
+
+    return {
+        "drug_name": drug_name,
+        "reaction": reaction,
+        "A": A,
+        "B": B,
+        "C": C,
+        "D": D,
+        "drug_total_reports": drug_total,
+        "other_drug_total_reports": other_drug_total,
+        "drug_reaction_rate": drug_reaction_rate,
+        "other_drug_reaction_rate": other_drug_reaction_rate,
+        "prr": prr,
+    }
 
 
 def _validate_dataframe(dataframe: pd.DataFrame) -> None:
