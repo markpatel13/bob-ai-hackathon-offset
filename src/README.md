@@ -1,47 +1,109 @@
 # Source Code
 
-Place all your project's source code in this folder.
+Place all the project's source code in this folder.
 
 ## Structure Guidelines
 
-Organize your code logically. Here are common patterns — use whatever fits
-your project:
-
-### Web Application
-```
-src/
-  backend/        ← API server code
-  frontend/       ← UI code
-  shared/         ← Shared utilities/types
-```
+This project is a data/AI-focused Streamlit application. The source
+code is organized into modules based on data ingestion, processing,
+statistical analysis, safety signal detection, trend analysis,
+AI-assisted summarization, database caching, and the user interface.
 
 ### Data / AI Project
-```
+
+```text
 src/
-  data/           ← Data ingestion / preprocessing
-  models/         ← ML model code
-  api/            ← Serving layer
-  notebooks/      ← Jupyter notebooks (exploration)
+
+    app.py              ← Streamlit application and dashboard UI
+
+    fda_api.py          ← openFDA API integration and data retrieval
+
+    data_processor.py   ← FDA report normalization and preprocessing
+
+    database.py         ← SQLite database and local data caching
+
+    prr_engine.py       ← Proportional Reporting Ratio (PRR) calculations
+
+    signal_detector.py  ← Safety signal detection, filtering, and ranking
+
+    trend_analysis.py   ← Adverse-event trend and time-series analysis
+
+    ai_summary.py       ← Plain-English summaries of detected safety signals
+
+    README.md           ← Source code documentation
+
+```
+### Web Application
+```
+openFDA API
+     ↓
+fda_api.py
+     ↓
+data_processor.py
+     ↓
+database.py
+     ↓
+prr_engine.py
+     ↓
+signal_detector.py
+     ↓
+trend_analysis.py
+     ↓
+ai_summary.py
+     ↓
+app.py
+     ↓
+Streamlit Dashboard
+
 ```
 
-### CLI / Script-based Tool
-```
-src/
-  cli/            ← CLI entry points
-  lib/            ← Core logic
-  utils/          ← Helpers
-```
+### Project Architecture Diagram:
 
-## Important Files to Include
-
-- `requirements.txt` or `package.json` — dependency manifest
-- `.env.example` — template for environment variables (NEVER commit `.env`)
-- Any database migration files
-- Configuration files
-
-## What NOT to Include in src/
-
-- `.env` files with real secrets
-- Large binary files (use Git LFS or link externally)
-- `node_modules/` or `venv/` (these are in `.gitignore`)
-- Build artifacts (`dist/`, `build/`, `__pycache__/`)
+                         ┌──────────────────┐
+                         │   openFDA API    │
+                         └────────┬─────────┘
+                                  │
+                                  ▼
+                         ┌──────────────────┐
+                         │   fda_api.py     │
+                         │ Data Retrieval   │
+                         └────────┬─────────┘
+                                  │
+                                  ▼
+                         ┌──────────────────┐
+                         │ data_processor.py│
+                         │ Normalization    │
+                         └────────┬─────────┘
+                                  │
+                                  ▼
+                         ┌──────────────────┐
+                         │   database.py    │
+                         │ SQLite Cache     │
+                         └────────┬─────────┘
+                                  │
+                                  ▼
+                         ┌──────────────────┐
+                         │   prr_engine.py  │
+                         │ PRR Calculation  │
+                         └────────┬─────────┘
+                                  │
+                                  ▼
+                         ┌──────────────────┐
+                         │signal_detector.py│
+                         │ Signal Detection │
+                         └───────┬───┬──────┘
+                                 │   │
+                    ┌────────────┘   └─────────────┐
+                    ▼                              ▼
+          ┌──────────────────┐           ┌──────────────────┐
+          │trend_analysis.py │           │  ai_summary.py   │
+          │ Trend Analysis   │           │ Plain-English    │
+          └────────┬─────────┘           │ Summaries        │
+                   │                     └────────┬─────────┘
+                   │                              │
+                   └──────────────┬───────────────┘
+                                  ▼
+                         ┌──────────────────┐
+                         │     app.py       │
+                         │ Streamlit UI     │
+                         └──────────────────┘

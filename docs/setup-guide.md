@@ -16,7 +16,7 @@ Before you begin, ensure you have the following installed:
 - [ ] **(Optional) An OpenAI or Anthropic API key** — only needed if you want
       LLM-generated plain-English summaries. The app is fully functional without one.
 
-No Docker, no Node.js, no database required.
+No Docker, no Node.js, no database(chromadb optional) required.
 
 ---
 
