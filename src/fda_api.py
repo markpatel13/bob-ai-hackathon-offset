@@ -4,8 +4,10 @@ Fetches adverse event reports from the openFDA Drug Event API.
 Endpoint: https://api.fda.gov/drug/event.json
 """
 
+from __future__ import annotations
+
 import requests
-from typing import Optional
+from typing import Any
 
 FDA_BASE_URL = "https://api.fda.gov/drug/event.json"
 DEFAULT_LIMIT = 100
@@ -15,9 +17,9 @@ def fetch_adverse_events(
     drug_name: str,
     limit: int = DEFAULT_LIMIT,
     skip: int = 0,
-    date_start: Optional[str] = None,
-    date_end: Optional[str] = None,
-) -> dict:
+    date_start: str | None = None,
+    date_end: str | None = None,
+) -> dict[str, Any]:
     """
     Fetch adverse event reports for a given drug from openFDA.
 
@@ -69,7 +71,7 @@ def fetch_adverse_events(
     return data
 
 
-def fetch_reaction_counts(drug_name: str, limit: int = 1000) -> dict:
+def fetch_reaction_counts(drug_name: str, limit: int = 1000) -> dict[str, int]:
     """
     Use the openFDA count endpoint to get reaction term frequencies for a drug.
     Returns a dict mapping reaction term -> count.
