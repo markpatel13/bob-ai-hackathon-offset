@@ -27,9 +27,10 @@ Application flow:
     Streamlit dashboard
 """
 
+from __future__ import annotations
+
 import sys
 from pathlib import Path
-from typing import Optional
 
 import pandas as pd
 import plotly.express as px
@@ -160,7 +161,11 @@ if "search_description" not in st.session_state:
 # Database initialization
 # -------------------------------------------------------------------
 
-initialize_database()
+try:
+    initialize_database()
+except Exception as exc:
+    st.error(f"Database initialization failed: {exc}")
+    st.stop()
 
 
 # -------------------------------------------------------------------
@@ -168,10 +173,10 @@ initialize_database()
 # -------------------------------------------------------------------
 
 def load_fda_data(
-    drug_name: Optional[str],
-    reaction: Optional[str],
+    drug_name: str | None,
+    reaction: str | None,
     limit: int,
-) -> tuple[pd.DataFrame, Optional[dict], str]:
+) -> tuple[pd.DataFrame, dict | None, str]:
     """
     Fetch FDA adverse-event data and convert it into a normalized
     dataframe.
@@ -275,6 +280,30 @@ def calculate_signals(
         prr_results,
         signals,
     )
+
+
+# -------------------------------------------------------------------
+# Utility functions
+# -------------------------------------------------------------------
+
+def _format_prr_value(value: float) -> str:
+    """
+    Format a PRR value for display on the dashboard.
+    """
+
+    try:
+
+        if value == float("inf"):
+            return "∞"
+
+        if pd.isna(value):
+            return "N/A"
+
+        return f"{float(value):.2f}"
+
+    except (TypeError, ValueError):
+
+        return "N/A"
 
 
 # -------------------------------------------------------------------
@@ -867,7 +896,7 @@ with tab_trends:
     # ---------------------------------------------------------------
 
     frequency_map = {
-        "Monthly": "M",
+        "Monthly": "ME",
         "Weekly": "W",
         "Daily": "D",
     }
@@ -1113,11 +1142,11 @@ with tab_about:
     # API metadata
     # ---------------------------------------------------------------
 
-    response = st.session_state.raw_response
+    raw_response = st.session_state.raw_response
 
-    if response and isinstance(response, dict):
+    if raw_response and isinstance(raw_response, dict):
 
-        meta = response.get(
+        meta = raw_response.get(
             "meta",
             {},
         )
@@ -1144,26 +1173,3 @@ st.caption(
     "Statistical signals are not confirmed causal relationships."
 )
 
-
-# -------------------------------------------------------------------
-# Utility functions
-# -------------------------------------------------------------------
-
-def _format_prr_value(value) -> str:
-    """
-    Format PRR for the dashboard.
-    """
-
-    try:
-
-        if value == float("inf"):
-            return "∞"
-
-        if pd.isna(value):
-            return "N/A"
-
-        return f"{float(value):.2f}"
-
-    except (TypeError, ValueError):
-
-        return "N/A"
