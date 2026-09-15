@@ -10,7 +10,7 @@ It can calculate:
 - Drug + reaction trends
 """
 
-from typing import Optional
+from __future__ import annotations
 
 import pandas as pd
 
@@ -34,11 +34,11 @@ _VALID_FREQUENCIES = {"D", "W", "M", "Q", "Y", "H", "T", "S", "ME", "QE", "YE"}
 
 def calculate_report_trend(
     dataframe: pd.DataFrame,
-    frequency: str = "M",
-    drug_name: Optional[str] = None,
-    reaction: Optional[str] = None,
-    start_date: Optional[str] = None,
-    end_date: Optional[str] = None,
+    frequency: str = "ME",
+    drug_name: str | None = None,
+    reaction: str | None = None,
+    start_date: str | None = None,
+    end_date: str | None = None,
     drop_partial_periods: bool = False,
 ) -> pd.DataFrame:
     """
@@ -89,6 +89,16 @@ def calculate_report_trend(
 
     if not frequency:
         raise ValueError("frequency cannot be empty.")
+
+    # dt.to_period() uses the legacy alias set ("M", "Q", "Y").
+    # Callers and app.py may supply the newer resample aliases ("ME",
+    # "QE", "YE").  Map them back so both forms are accepted.
+    _PERIOD_ALIAS_MAP = {
+        "ME": "M",
+        "QE": "Q",
+        "YE": "Y",
+    }
+    period_frequency = _PERIOD_ALIAS_MAP.get(frequency.upper(), frequency)
 
     result = dataframe.copy()
 
@@ -184,7 +194,7 @@ def calculate_report_trend(
 
     try:
         result = result.copy()
-        result["period"] = result["received_date"].dt.to_period(frequency)
+        result["period"] = result["received_date"].dt.to_period(period_frequency)
     except ValueError as exc:
         raise ValueError(
             f"Unsupported frequency: {frequency!r}"
@@ -221,10 +231,10 @@ def calculate_report_trend(
 
 def calculate_monthly_trend(
     dataframe: pd.DataFrame,
-    drug_name: Optional[str] = None,
-    reaction: Optional[str] = None,
-    start_date: Optional[str] = None,
-    end_date: Optional[str] = None,
+    drug_name: str | None = None,
+    reaction: str | None = None,
+    start_date: str | None = None,
+    end_date: str | None = None,
 ) -> pd.DataFrame:
     """
     Calculate monthly adverse-event report volume.
@@ -232,7 +242,7 @@ def calculate_monthly_trend(
 
     return calculate_report_trend(
         dataframe=dataframe,
-        frequency="M",
+        frequency="ME",
         drug_name=drug_name,
         reaction=reaction,
         start_date=start_date,
@@ -246,10 +256,10 @@ def calculate_monthly_trend(
 
 def calculate_weekly_trend(
     dataframe: pd.DataFrame,
-    drug_name: Optional[str] = None,
-    reaction: Optional[str] = None,
-    start_date: Optional[str] = None,
-    end_date: Optional[str] = None,
+    drug_name: str | None = None,
+    reaction: str | None = None,
+    start_date: str | None = None,
+    end_date: str | None = None,
 ) -> pd.DataFrame:
     """
     Calculate weekly adverse-event report volume.
@@ -271,10 +281,10 @@ def calculate_weekly_trend(
 
 def calculate_daily_trend(
     dataframe: pd.DataFrame,
-    drug_name: Optional[str] = None,
-    reaction: Optional[str] = None,
-    start_date: Optional[str] = None,
-    end_date: Optional[str] = None,
+    drug_name: str | None = None,
+    reaction: str | None = None,
+    start_date: str | None = None,
+    end_date: str | None = None,
 ) -> pd.DataFrame:
     """
     Calculate daily adverse-event report volume.
@@ -298,8 +308,8 @@ def compare_drug_trends(
     dataframe: pd.DataFrame,
     drug_names: list[str],
     frequency: str = "M",
-    start_date: Optional[str] = None,
-    end_date: Optional[str] = None,
+    start_date: str | None = None,
+    end_date: str | None = None,
 ) -> pd.DataFrame:
     """
     Calculate report trends for multiple drugs.
@@ -353,8 +363,8 @@ def compare_reaction_trends(
     dataframe: pd.DataFrame,
     reactions: list[str],
     frequency: str = "M",
-    start_date: Optional[str] = None,
-    end_date: Optional[str] = None,
+    start_date: str | None = None,
+    end_date: str | None = None,
 ) -> pd.DataFrame:
     """
     Calculate report trends for multiple reactions.
@@ -589,7 +599,7 @@ def prepare_trend_for_chart(
 
 def _validate_dataframe(
     dataframe: pd.DataFrame,
-    extra_columns: Optional[set] = None,
+    extra_columns: set | None = None,
 ) -> None:
     """
     Validate the input dataframe.

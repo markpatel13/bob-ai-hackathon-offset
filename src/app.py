@@ -254,6 +254,7 @@ def calculate_signals(
     dataframe: pd.DataFrame,
     min_prr: float,
     min_reports: int,
+    selected_drug: str | None = None,
 ) -> tuple[pd.DataFrame, pd.DataFrame]:
     """
     Calculate PRR values and detect statistical signals.
@@ -269,6 +270,11 @@ def calculate_signals(
         dataframe,
         min_reports=1,
     )
+
+    if selected_drug:
+        prr_results = prr_results[
+            prr_results["drug_name"] == selected_drug.strip().upper()
+        ].reset_index(drop=True)
 
     signals = detect_signals(
         prr_results,
@@ -454,6 +460,11 @@ if search_button:
                     dataframe,
                     min_prr=min_prr,
                     min_reports=int(min_reports),
+                    selected_drug=(
+                        drug_input.strip()
+                        if drug_input.strip()
+                        else None
+                    ),
                 )
 
                 st.session_state.prr_results = prr_results

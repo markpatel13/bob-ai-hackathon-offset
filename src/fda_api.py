@@ -13,22 +13,32 @@ FDA_BASE_URL = "https://api.fda.gov/drug/event.json"
 DEFAULT_LIMIT = 100
 
 
+class FDAAPIError(RuntimeError):
+    """Raised when an openFDA request cannot return a valid response."""
+
+
 def fetch_adverse_events(
-    drug_name: str,
+    drug_name: str | None = None,
     limit: int = DEFAULT_LIMIT,
     skip: int = 0,
     date_start: str | None = None,
     date_end: str | None = None,
+    search: str | None = None,
 ) -> dict[str, Any]:
     """
-    Fetch adverse event reports for a given drug from openFDA.
+    Fetch adverse event reports from openFDA.
 
     Args:
         drug_name:   Brand or generic drug name to search for.
+                     Ignored when ``search`` is provided directly.
         limit:       Number of records to return (max 1000 per request).
         skip:        Offset for pagination.
         date_start:  Start date filter in YYYYMMDD format (e.g. '20200101').
         date_end:    End date filter in YYYYMMDD format (e.g. '20231231').
+        search:      Raw openFDA search query string.  When provided,
+                     ``drug_name``, ``date_start``, and ``date_end`` are
+                     ignored and this value is passed directly as the
+                     ``search`` parameter.
 
     Returns:
         Parsed JSON response dict with keys 'meta' and 'results'.
@@ -37,34 +47,47 @@ def fetch_adverse_events(
         requests.HTTPError: on non-2xx responses.
         ValueError:         if the API returns no results field.
     """
-    # Build the search query
-    search_parts = [f'patient.drug.medicinalproduct:"{drug_name}"']
 
-    if date_start and date_end:
-        search_parts.append(
-            f"receivedate:[{date_start}+TO+{date_end}]"
-        )
-    elif date_start:
-        search_parts.append(f"receivedate:[{date_start}+TO+99991231]")
-    elif date_end:
-        search_parts.append(f"receivedate:[19000101+TO+{date_end}]")
+    if search is not None:
+        # Caller supplied a fully-formed openFDA query — use it as-is.
+        search_query: str | None = search
+    elif drug_name is not None:
+        # Build a query from the individual fields.
+        search_parts = [f'patient.drug.medicinalproduct:"{drug_name}"']
 
-    search_query = "+AND+".join(search_parts)
+        if date_start and date_end:
+            search_parts.append(
+                f"receivedate:[{date_start}+TO+{date_end}]"
+            )
+        elif date_start:
+            search_parts.append(f"receivedate:[{date_start}+TO+99991231]")
+        elif date_end:
+            search_parts.append(f"receivedate:[19000101+TO+{date_end}]")
 
-    params = {
-        "search": search_query,
+        search_query = "+AND+".join(search_parts)
+    else:
+        search_query = None
+
+    params: dict[str, Any] = {
         "limit": limit,
         "skip": skip,
     }
 
-    response = requests.get(FDA_BASE_URL, params=params, timeout=15)
-    response.raise_for_status()
+    if search_query is not None:
+        params["search"] = search_query
 
-    data = response.json()
+    try:
+        response = requests.get(FDA_BASE_URL, params=params, timeout=15)
+        response.raise_for_status()
+        data = response.json()
+    except (requests.RequestException, ValueError) as exc:
+        raise FDAAPIError(
+            f"Unable to retrieve adverse-event reports: {exc}"
+        ) from exc
 
     if "results" not in data:
-        raise ValueError(
-            f"No results in FDA response for drug '{drug_name}'. "
+        raise FDAAPIError(
+            f"No results in FDA response. "
             f"Meta: {data.get('meta', {})}"
         )
 

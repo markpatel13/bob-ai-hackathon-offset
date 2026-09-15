@@ -10,6 +10,7 @@ Database file:
 
 from pathlib import Path
 import sqlite3
+from datetime import date, datetime
 from typing import Optional
 
 import pandas as pd
@@ -576,6 +577,9 @@ def _safe_value(value):
 
     if pd.isna(value):
         return None
+
+    if isinstance(value, (pd.Timestamp, datetime, date)):
+        return value.strftime("%Y-%m-%d")
 
     return value
 

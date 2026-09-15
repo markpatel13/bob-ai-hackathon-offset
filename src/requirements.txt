@@ -1,0 +1,24 @@
+# -----------------------------------------------------------------------
+# Drug Safety Signal Detector — Python dependencies
+#
+# Install with:
+#   pip install -r src/requirements.txt
+#
+# Python >= 3.10 required (uses X | Y union type syntax).
+# -----------------------------------------------------------------------
+
+# --- Web / UI -----------------------------------------------------------
+streamlit==1.54.0          # Dashboard UI
+
+# --- Data processing ----------------------------------------------------
+pandas==2.3.3              # DataFrames, time-series, normalisation
+numpy==2.4.2               # Numerical operations (used by pandas / scipy)
+
+# --- Statistics ---------------------------------------------------------
+scipy==1.16.0              # Statistical tests (chi-square, etc.)
+
+# --- Visualisation ------------------------------------------------------
+plotly==6.6.0              # Interactive charts in the Streamlit dashboard
+
+# --- HTTP / API ---------------------------------------------------------
+requests==2.32.5           # openFDA REST API calls
