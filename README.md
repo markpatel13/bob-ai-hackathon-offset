@@ -1,4 +1,4 @@
-# 🚀 [Your Project Title Here]
+# 🚀 [Drug Safety Signal Detector]
 
 > ⚠️ **Replace everything in `[ ]` brackets with your actual content before submission.**
 
@@ -8,10 +8,10 @@
 
 | Field | Value |
 |---|---|
-| **Team Name** | [Your Team Name] |
-| **Track** | [AI / DevOps / Sustainability / Open] |
-| **Team Lead** | [Name] — [email@ibm.com] |
-| **Members** | [Name 1], [Name 2], [Name 3] |
+| **Team Name** | [offset] |
+| **Track** | [AI] |
+| **Team Lead** | [Mark Patel] — [23dcs083@charusat.edu.in] |
+| **Members** | [Mir Patel], [Samad Sama], [Keya Sonaiya] |
 
 ---
 
@@ -19,7 +19,7 @@
 
 > In 2–3 sentences: What problem does your project solve? Who experiences this problem?
 
-[Describe the real-world problem your project addresses. Be specific about who the user is and what pain point they face.]
+[Millions of adverse drug event reports are collected in the FDA database, making it difficult for pharmacovigilance teams and analysts to identify unusual drug-reaction patterns from large volumes of data. Important safety signals can be difficult to recognize early because individual reports may contain multiple drugs and reactions and the overall reporting volume is very large.]
 
 ---
 
@@ -27,17 +27,17 @@
 
 > In 2–3 sentences: What did you build? How does it solve the problem above?
 
-[Describe your solution clearly. Explain the core mechanism — what makes it work.]
+[Drug Safety Signal Detector is a Streamlit-based application that retrieves publicly available adverse-event reports from the FDA openFDA API, processes them into drug-reaction pairs, and calculates the Proportional Reporting Ratio (PRR) to identify disproportionate reporting signals. The application combines statistical analysis, ranked signal visualization, adverse-event trends, and plain-English explanations to help users explore potential safety signals while clearly distinguishing statistical association from confirmed causality.]
 
 ---
 
 ## ✨ Key Features
 
-- **Feature 1:** [Brief description — e.g., "Real-time anomaly detection using watsonx.ai"]
-- **Feature 2:** [Brief description]
-- **Feature 3:** [Brief description]
-- **Feature 4:** [Optional]
-- **Feature 5:** [Optional]
+- **FDA Adverse-Event Search & Filtering:** [Search and filter FDA adverse-event reports by drug and reaction using the openFDA API.]
+- **PRR-Based Statistical Signal Detection:** [Calculate the Proportional Reporting Ratio (PRR) for drug-reaction pairs to identify disproportionate reporting patterns.]
+- **Ranked Safety Signal Dashboard:** [Rank detected signals according to signal strength and report counts, with the underlying statistical counts available for transparency.]
+- **Adverse-Event Trend Visualization:** [Visualize adverse-event report volume over time using daily, weekly, or monthly trends, with optional drug and reaction filtering.]
+- **Plain-English AI-Generated Summaries:** [Convert detected statistical signals and their verified numerical results into understandable explanations while avoiding unsupported causal claims.]
 
 ---
 
@@ -45,28 +45,47 @@
 
 | Category | Technologies |
 |---|---|
-| **Languages** | [e.g., Python, TypeScript] |
-| **Frameworks** | [e.g., FastAPI, React] |
-| **IBM Technologies** | [e.g., watsonx.ai, IBM Bob, IBM Cloud] |
-| **Databases** | [e.g., PostgreSQL, Redis] |
-| **Other** | [e.g., Docker, GitHub Actions] |
+| **Languages** | [Python] |
+| **Frameworks** | [Streamlit] |
+| **IBM Technologies** | [IBM Bob] |
+| **Databases** | [SQlite] |
+| **Other** | [Github,Pandas,NumPy,SciPy,Plotly,FDA-Open-api] |
 
 ---
 
 ## 📁 Repository Structure
 
 ```
-├── src/                  # All source code
-├── docs/                 # Written documentation
+├── src/                              # All source code
+│   ├── app.py                        # Streamlit application
+│   ├── fda_api.py                    # openFDA API integration
+│   ├── data_processor.py             # FDA data processing
+│   ├── database.py                   # SQLite caching/storage
+│   ├── prr_engine.py                 # PRR calculations
+│   ├── signal_detector.py            # Signal detection/ranking
+│   ├── trend_analysis.py             # Trend analysis
+│   ├── ai_summary.py                 # Plain-English summaries
+│   └── README.md                     # Source-code documentation
+│
+├── docs/                             # Written documentation
 │   ├── problem-statement.md
 │   ├── solution-overview.md
 │   ├── architecture.md
 │   └── setup-guide.md
-├── demo/                 # Demo artifacts
-│   ├── screenshots/      # App screenshots
-│   └── demo-video-link.txt  # Link to demo video
-├── presentation/         # Slide deck
-└── submission.yaml       # Structured submission metadata
+│
+├── demo/                             # Demo artifacts
+│   ├── screenshots/                   # App screenshots
+│   ├── demo-video-link.txt            # Link to demo video
+│   └── live-demo-url.txt              # Link to live demo
+│
+├── presentation/                     # Presentation / slide deck
+│
+├── bob_sessions/                     # IBM Bob task session reports
+│
+├── requirements.txt                  # Python dependencies
+├── .env.example                      # Environment variable template
+├── .gitignore                        # Git exclusions
+└── submission.yaml                   # Structured submission metadata
 ```
 
 ---
@@ -76,19 +95,17 @@
 > **Copy these exact steps from your [`docs/setup-guide.md`](docs/setup-guide.md)**
 
 ```bash
-# 1. Clone the repo
-git clone https://github.com/[your-repo].git
-cd [your-repo]
+# 1. Clone the repository
+git clone https://github.com/[your-github-username]/bob-ai-hackathon-offset.git
 
-# 2. Install dependencies
-[your install command here]
+# 2. Enter the project directory
+cd bob-ai-hackathon-offset
 
-# 3. Configure environment
-cp .env.example .env
-# Edit .env with your values
+# 3. Install dependencies
+pip install -r requirements.txt
 
-# 4. Run the project
-[your run command here]
+# 4. Run the Streamlit application
+streamlit run src/app.py
 ```
 
 ---
@@ -108,14 +125,18 @@ cp .env.example .env
 
 > Be honest — judges appreciate transparency over overclaiming.
 
-- [Limitation 1: e.g., "Authentication is mocked — not production-ready"]
-- [Limitation 2: e.g., "Only tested on Chrome"]
-- [Limitation 3: e.g., "Feature X is scaffolded but not fully implemented"]
+-Statistical signal ≠ causality: [A high PRR does not establish that a drug caused an adverse reaction.]
+-Reporting bias: [FDA spontaneous adverse-event reports can be influenced by differences in reporting behavior and awareness.]
+-Incomplete information: [Individual reports may contain missing or incomplete patient, drug, or reaction information.]
 
 ---
 
 ## 🏅 What We're Most Proud Of
 
-[Tell the judges what part of your submission is strongest and worth paying close attention to.]
+[Our strongest aspect is the combination of real-world FDA adverse-event data with a transparent and explainable statistical method.
+
+Instead of presenting an opaque prediction, Drug Safety Signal Detector shows how a potential signal is identified through PRR, provides the underlying report counts, ranks the strongest drug-reaction patterns, visualizes how report volume changes over time, and translates the statistical findings into understandable plain-English explanations.
+
+The project also deliberately separates statistical signal detection from causal claims, making the result easier to interpret responsibly.]
 
 ---
